@@ -2,7 +2,8 @@ using System.Collections.Generic;
 using System;
 using System.Net.Http;
 using common.controllers;
- 
+using System.Net;
+
 namespace controllers{ 
 
     public class HttpController : BaseController{
@@ -15,6 +16,34 @@ namespace controllers{
         public HttpController(HttpClient httpClientInstance) {
             this.ClientInstance = httpClientInstance;
             this.ClientInstance.Timeout = TimeSpan.FromMilliseconds(2000);
+        }
+
+
+        public async Task<HttpResponseMessage> request(string url, HttpContent? body) 
+        {
+
+            if (body != null)
+            {
+                try
+                {
+                  HttpResponseMessage response = this.ClientInstance.PostAsync(url, body);
+                  response.EnsureSuccessStatusCode();
+
+                  return response;
+
+                } catch (Exception e)
+                {
+                    
+                    return new HttpResponseMessage(HttpStatusCode.BadRequest) {Content = new StringContent($"Something had gone wrong issuing this request {e.Message}")};
+                              
+                }
+                
+            } 
+
+        
+
+
+            
         }
 
 

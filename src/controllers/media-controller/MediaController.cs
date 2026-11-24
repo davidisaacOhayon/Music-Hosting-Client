@@ -7,35 +7,18 @@ using types.common;
 using caches;
 namespace controllers
 {
-
-
     public class MediaController
     {
-
-
         private readonly HttpController _httpController;
 
         private readonly MediaCache _mediaCache;
-
 
         public MediaController(HttpController httpController, MediaCache mediaCache)
         {   
             this._mediaCache = mediaCache;
             this._httpController = httpController;
-            
-            
         }   
- 
 
-        public async void DownloadAudio(string url)
-        {
-            Console.WriteLine($"Downloading audio from {url}");
-            var response = await this._httpController.requestDownloadMedia(url, Path.Combine(Directory.GetCurrentDirectory(), "audio"));
-
-            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
-        }
-
-    
         public async Task<MediaMetaData> GetMediaMetaData(string url)
         {
 
@@ -70,10 +53,10 @@ namespace controllers
 
 
         }
+       
         public async Task DownloadMediaBySourceURL(string url)
         {
-             
-            Console.WriteLine($"Downloading audio from {url}");
+ 
             MediaMetaData mediaMetaData = await this.GetMediaMetaData(url);
 
             Process tempProcess = new Process {StartInfo = new ProcessStartInfo
@@ -89,7 +72,6 @@ namespace controllers
  
             string runtimePath = Path.Combine(AppContext.BaseDirectory, "runtimes/deno/deno.exe");
 
-            
             // TODO: At the current moment, we are externalizing the retrieval of the audio file
             // to YT-DLP. This is a temporary solution to cut down system complexity.
             // Would be ideal if we could reverse engineer how this is achieved, and implement it homemade.
@@ -101,7 +83,6 @@ namespace controllers
  
             tempProcess.Start();
    
- 
             string output = tempProcess.StandardOutput.ReadToEnd();
             // string error = await this._process.StandardError.ReadToEndAsync();
             mediaMetaData.filePath = urlPath;

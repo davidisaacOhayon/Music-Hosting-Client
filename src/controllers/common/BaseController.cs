@@ -1,7 +1,7 @@
 using System;
 
 
-namespace common.controllers{
+namespace controllers.common{
 
     public abstract class BaseController {
         

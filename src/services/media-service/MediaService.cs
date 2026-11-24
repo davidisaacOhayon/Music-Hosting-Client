@@ -7,16 +7,16 @@ using types.common;
 using caches;
 namespace controllers
 {
-    public class MediaController
+    public class MediaService
     {
-        private readonly HttpController _httpController;
+        private readonly HttpService _httpService;
 
         private readonly MediaCache _mediaCache;
 
-        public MediaController(HttpController httpController, MediaCache mediaCache)
+        public MediaService(HttpService httpService, MediaCache mediaCache)
         {   
             this._mediaCache = mediaCache;
-            this._httpController = httpController;
+            this._httpService = httpService;
         }   
 
         public async Task<MediaMetaData> GetMediaMetaData(string url)
@@ -54,10 +54,19 @@ namespace controllers
 
         }
        
-        public async Task DownloadMediaBySourceURL(string url)
+        public async Task<MediaMetaData> DownloadMediaBySourceURL(string url)
         {
  
             MediaMetaData mediaMetaData = await this.GetMediaMetaData(url);
+            
+            Dictionary<string, MediaMetaData> tempMediaCache = this._mediaCache.GetMediaCache();
+
+            // If file already exists in current cache session
+            if (tempMediaCache.Keys.Contains(mediaMetaData.Id))
+            {
+              // Retrieve meta data of that audio
+              return tempMediaCache[mediaMetaData.Id];
+            }
 
             Process tempProcess = new Process {StartInfo = new ProcessStartInfo
                 {
@@ -83,15 +92,16 @@ namespace controllers
  
             tempProcess.Start();
    
-            string output = tempProcess.StandardOutput.ReadToEnd();
+            // string output = tempProcess.StandardOutput.ReadToEnd();
             // string error = await this._process.StandardError.ReadToEndAsync();
             mediaMetaData.filePath = urlPath;
             this._mediaCache.CacheMediaInfo(mediaMetaData.Id, mediaMetaData);
-
-            Console.WriteLine($"Finished downloading audio {output}");
+ 
+            Console.WriteLine($"Finished downloading audio");
             // Console.WriteLine(error);
             await tempProcess.WaitForExitAsync();
-            
+
+            return mediaMetaData;
             // VideoMetaData data = JsonSerializer.Deserialize<VideoMetaData>(output);
             // // TODO: Check if downloaded formats retrieved can have multiple elements.
             // Console.WriteLine(data.downloads[0].url);
@@ -99,5 +109,39 @@ namespace controllers
 
 
         }
-    }
+    
+        public async Task<string> RetrieveMediaSearch(string search)
+        {
+            Process tempProcess = new Process {StartInfo = new ProcessStartInfo
+                {
+                    FileName = Path.Combine(Directory.GetCurrentDirectory(), "yt-dlp.exe"),
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false
+                }   
+            };
+            
+            // tempProcess.StartInfo.ArgumentList.Add("--no-download");
+            tempProcess.StartInfo.ArgumentList.Add("--dump-json");
+            tempProcess.StartInfo.ArgumentList.Add("--flat-playlist");
+            tempProcess.StartInfo.ArgumentList.Add($"ytsearch5:{search}");
+            
+            tempProcess.Start();
+
+            Task<string> output = tempProcess.StandardOutput.ReadToEndAsync();
+            Task<string> error = tempProcess.StandardError.ReadToEndAsync();
+
+            await tempProcess.WaitForExitAsync();
+
+            string stdOutput = await output;
+            string stdError = await error;
+            
+        
+            return stdOutput;
+
+       
+           
+        }
+    }   
+
 }

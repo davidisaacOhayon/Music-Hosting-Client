@@ -2,14 +2,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 namespace types.common
 {
-    public interface IMediaHttpResponse
-    {
-        string? id {get; set;}
-        string? title {get; set;}
-        string? filePath {get; set;}
-        string? timeStamp {get; set;}
-    }
-        public class RequestedFormat()
+ 
+    public class RequestedFormat()
     {
         [JsonPropertyName("format_id")]
         public string? formatId {get; set;}
@@ -29,16 +23,24 @@ namespace types.common
 
     public class MediaMetaData()
     {
-
         [JsonPropertyName("id")]
         public string? Id {get; set;}
 
         [JsonPropertyName("title")]
         public string? Title {get; set;}
 
+        [JsonPropertyName("url")]
+        public string? Url {get; set; }
+
         public string? filePath {get; set;}
-
-
-   
     }
+
+    public class SearchSongRequest()
+    {
+        public string songName {get; set;}
+    }
+
+ 
+
+
 }

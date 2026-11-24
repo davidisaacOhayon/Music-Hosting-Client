@@ -2,7 +2,7 @@
 
 
 
-namespace controllers.common.types{
+namespace types.common{
 
     public interface Controller {
 

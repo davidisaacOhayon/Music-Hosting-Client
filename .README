@@ -1,0 +1,2 @@
+# Test Client Controller Endpoint
+curl -X POST -H "Content-Type: application/json" -d "{\"songName\":\"im blue\"}" http://localhost:5000/Client/SearchSong

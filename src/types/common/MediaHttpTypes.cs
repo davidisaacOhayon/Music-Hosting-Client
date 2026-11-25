@@ -35,9 +35,16 @@ namespace types.common
         public string? filePath {get; set;}
     }
 
-    public class SearchSongRequest()
+    public class SearchMediaRequest()
     {
-        public string songName {get; set;}
+        [JsonPropertyName("songName")]
+        public string SongName {get; set;}
+    }
+
+    public class DownloadMediaRequest()
+    {
+        [JsonPropertyName("url")]
+        public string Url {get; set;}
     }
 
  

@@ -25,27 +25,28 @@ namespace controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> DownloadMedia([FromBody] string url)
+        public async Task<IActionResult> DownloadMedia([FromBody] DownloadMediaRequest request)
         {
-            MediaMetaData response = await this._mediaService.DownloadMediaBySourceURL(url);
+            MediaMetaData response = await this._mediaService.DownloadMediaBySourceURL(request.Url);
 
             if (response != null)
             {
-                return BadRequest(new {message = "Error downloading media"});
-            } else {
                 return Ok(new {message = $"Audio downloaded at {response!.filePath}", mediapath = response.filePath, id = response.Id, title = response.Title});
-            }
+            } else {
+                 return BadRequest(new {message = "Error downloading media"});
+            }    
+                
         }
 
         [HttpPost]
-        public async Task<IActionResult> SearchSong([FromBody] SearchSongRequest request)
+        public async Task<IActionResult> SearchSong([FromBody] SearchMediaRequest request)
         {
-            string output = await this._mediaService.RetrieveMediaSearch(request.songName);
+            string output = await this._mediaService.RetrieveMediaSearch(request.SongName);
 
             List<MediaMetaData> results = output.Split("\n", StringSplitOptions.RemoveEmptyEntries)
             .Select(line => JsonSerializer.Deserialize<MediaMetaData>(line)).ToList();
          
-            return Ok(new {message = results[0]});
+            return Ok(new {message = results});
         }
 
     }

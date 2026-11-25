@@ -8,47 +8,21 @@ using System.CodeDom;
 using Microsoft.Extensions.DependencyInjection;
 using caches;
 
-namespace Program {
 
-    public class Program {
+var builder = WebApplication.CreateBuilder(args);
 
-        static ServiceCollection _services = new ();
+// Helper Dependencies
+builder.Services.AddSingleton<HttpClient>();
 
-        static ServiceProvider _serviceProvider;
+// Caches
+builder.Services.AddSingleton<MediaCache>();
 
-        private string LastPlayedSong;
+// Controllers
+builder.Services.AddSingleton<HttpService>();
+builder.Services.AddSingleton<MediaService>();
+builder.Services.AddControllers();
 
-        public static void Main(string[] args) {
-            registerServices();
-            TestProcessor();
-        }
-
-
-        public static async void TestProcessor()
-        {
-            Console.WriteLine("Testing processor, downloading music.");
-           _serviceProvider.GetRequiredService<MediaController>().DownloadMediaBySourceURL("https://www.youtube.com/watch?v=FF0s7dtEKIA");
-        }
+var app = builder.Build();
  
-        public static void registerServices()
-        {
-            // Helper Dependencies
-            _services.AddSingleton<HttpClient>();
-
-            // Caches
-            _services.AddSingleton<MediaCache>();
-            
-            // Controllers
-            _services.AddSingleton<HttpController>();
-            _services.AddSingleton<MediaController>();
- 
-            // Builds Service Provider
-            _serviceProvider = _services.BuildServiceProvider();
-
-        }
-
-
-    }
-
-
-}
+app.MapControllers();
+app.Run();

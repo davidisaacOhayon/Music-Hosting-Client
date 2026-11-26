@@ -32,6 +32,9 @@ namespace types.common
         [JsonPropertyName("url")]
         public string? Url {get; set; }
 
+        [JsonPropertyName("thumbnail")]
+        public string? Thumbnail {get; set;}
+
         public string? filePath {get; set;}
     }
 

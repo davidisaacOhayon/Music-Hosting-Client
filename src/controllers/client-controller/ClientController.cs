@@ -46,7 +46,7 @@ namespace controllers
             List<MediaMetaData> results = output.Split("\n", StringSplitOptions.RemoveEmptyEntries)
             .Select(line => JsonSerializer.Deserialize<MediaMetaData>(line)).ToList();
          
-            return Ok(new {message = results});
+            return Ok(new {results});
         }
 
     }

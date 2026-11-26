@@ -1,40 +1,69 @@
-import { app, BrowserWindow } from 'electron';
-import path from 'node:path';
+import { app, BrowserWindow, ipcMain, IpcMainEvent } from 'electron';
 import started from 'electron-squirrel-startup';
+import path from "node:path"
+import { HttpMediaSearchResponse, MediaRequest } from "./types/http-request-type/httptypes";
+import { httpRequestMedia } from './services/http-service/HttpService';
+const INDEX_FILE_PATH: string = process.cwd() + "/src/index.html";
 
+declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
+declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
 }
 
-const createWindow = () => {
+
+const initializeIPCListeners = () => {
+
+}
+
+const createWindow = (): void => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 800,
     height: 600,
+    width: 800,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.cjs'),
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: false
     },
+ 
   });
-
-  // and load the index.html of the app.
-  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
-  } else {
-    mainWindow.loadFile(
-      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
-    );
+mainWindow.webContents.on(
+  'preload-error',
+  (_event, preloadPath, error) => {
+    console.error('PRELOAD PATH:', preloadPath);
+    console.error('PRELOAD ERROR:', error);
   }
+);
+  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+ 
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
 };
+
+  ipcMain.on("media:search", async (_event, query: string) => {
+    console.log(`I got your ${query}`);
+    const request : MediaRequest = {
+      songName: query
+    }
+
+    const response : HttpMediaSearchResponse | null = await httpRequestMedia(request);
+    if(response) {
+      console.log(response.results);
+    }
+    // TODO: Handle response by populating stores
+
+  })
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   createWindow();
+
 
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.

@@ -3,6 +3,7 @@ import started from 'electron-squirrel-startup';
 import path from "node:path"
 import { HttpMediaSearchResponse, MediaRequest } from "./types/http-request-type/httptypes";
 import { httpRequestMedia } from './services/http-service/HttpService';
+import { MediaIPCChannel, RegisterIPCChannels } from './services';
 const INDEX_FILE_PATH: string = process.cwd() + "/src/index.html";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
@@ -14,7 +15,9 @@ if (started) {
 
 
 const initializeIPCListeners = () => {
-
+  console.log("Registering IPC channels")
+   const mediaIpc : MediaIPCChannel = new MediaIPCChannel();
+   mediaIpc.register();
 }
 
 const createWindow = (): void => {
@@ -44,6 +47,8 @@ mainWindow.webContents.on(
   mainWindow.webContents.openDevTools();
 };
 
+// initializeIPCListeners();
+
   ipcMain.on("media:search", async (_event, query: string) => {
     console.log(`I got your ${query}`);
     const request : MediaRequest = {
@@ -54,7 +59,7 @@ mainWindow.webContents.on(
     if(response) {
       console.log(response.results);
     }
-    // TODO: Handle response by populating stores
+
 
   })
 
@@ -63,7 +68,6 @@ mainWindow.webContents.on(
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   createWindow();
-
 
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.

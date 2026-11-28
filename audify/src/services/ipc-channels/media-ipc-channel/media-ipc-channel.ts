@@ -10,6 +10,10 @@ export class MediaIPCChannel implements IPCChannel  {
         ipcMain.handle("media:search", async (_, query) => this.handleMediaSearch(query))
     }
 
+    handleMediaStream = async (mediaId: string) => {
+        // TODO: Implement request to .NET backend to send media stream.
+    }
+    
     handleMediaSearch = async (query: string) => {
         const setSongList = useSongListStore.getState().setSongList;
         const mediaQuery: MediaRequest = {

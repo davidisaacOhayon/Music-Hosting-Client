@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type {MediaRequest, HttpMediaSearchResponse} from '../../types/http-request-type/httptypes';
- 
+import type { AxiosResponse } from 'axios';
 // AxiosRequestConfig<D = any, P = any>
 // RawAxiosRequestConfig<D = any, P = any>
 // InternalAxiosRequestConfig<D = any, P = any>
@@ -22,7 +22,7 @@ export const httpRequestMedia = async (query: MediaRequest) : Promise<HttpMediaS
         data = await axios.post('http://localhost:5000/Client/SearchSong', {
             songName: query.songName
         })
-        .then(response => {if (response.data) {
+        .then( (response) => {if (response.data) {
             // TODO: Proper Error handling
             return response.data;
         }})
